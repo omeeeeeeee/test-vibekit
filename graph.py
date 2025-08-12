@@ -3,36 +3,21 @@ from typing import TypedDict
 import json
 
 class GraphState(TypedDict):
-    data: dict
+    result: dict
 
-def add_apple(state: GraphState) -> GraphState:
-    state["data"]["apple"] = 1
-    return state
+def generate_fruit_dict(state: GraphState) -> GraphState:
+    return {"result": {"apple": 1, "banana": 2, "cherry": 3}}
 
-def add_banana(state: GraphState) -> GraphState:
-    state["data"]["banana"] = 2
-    return state
-
-def add_cherry(state: GraphState) -> GraphState:
-    state["data"]["cherry"] = 3
-    return state
-
-def build_graph():
+def create_graph():
     workflow = StateGraph(GraphState)
     
-    workflow.add_node("apple", add_apple)
-    workflow.add_node("banana", add_banana)
-    workflow.add_node("cherry", add_cherry)
-    
-    workflow.set_entry_point("apple")
-    workflow.add_edge("apple", "banana")
-    workflow.add_edge("banana", "cherry")
-    workflow.add_edge("cherry", END)
+    workflow.add_node("generate", generate_fruit_dict)
+    workflow.set_entry_point("generate")
+    workflow.add_edge("generate", END)
     
     return workflow.compile()
 
 if __name__ == "__main__":
-    graph = build_graph()
-    initial_state = {"data": {}}
-    result = graph.invoke(initial_state)
-    print(json.dumps(result["data"]))
+    graph = create_graph()
+    result = graph.invoke({"result": {}})
+    print(json.dumps(result["result"]))
